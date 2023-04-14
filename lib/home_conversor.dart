@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -14,15 +15,18 @@ class _HomeConverState extends State<HomeConver> {
   final realControl = TextEditingController();
   final dolarControl = TextEditingController();
   final euroControl = TextEditingController();
+  final kwanzaControl = TextEditingController();
 
   double dolar = 0;
   double euro = 0;
+  double kwanza = 0;
 
   @override
   void dispose() {
     realControl.dispose();
     dolarControl.dispose();
     euroControl.dispose();
+    kwanzaControl.dispose();
     super.dispose();
   }
 
@@ -39,6 +43,7 @@ class _HomeConverState extends State<HomeConver> {
               if (snapshot.connectionState == ConnectionState.done) {
                 dolar = double.parse(snapshot.data!['USDBRL']['bid']);
                 euro = double.parse(snapshot.data!['EURBRL']['bid']);
+                kwanza = double.parse(snapshot.data!['CHFBRL']['bid']);
                 // dolar = snapshot.data!['USD']['buy'];
                 // euro = snapshot.data!['EUR']['buy'];
                 return SingleChildScrollView(
@@ -52,13 +57,16 @@ class _HomeConverState extends State<HomeConver> {
                       ),
                       const SizedBox(height: 20),
                       currencyTextField(
-                          'reais ', 'R\$ ', realControl, _convertReal),
+                          'Reais ', 'R\$ ', realControl, _convertReal),
                       const SizedBox(height: 20),
                       currencyTextField(
                           'Dolares', 'US\$ ', dolarControl, _convertDolar),
                       const SizedBox(height: 20),
                       currencyTextField(
                           'Euros', '€ ', euroControl, _convertEuro),
+                      const SizedBox(height: 20),
+                      currencyTextField(
+                          'Franco Suíço', 'FR', kwanzaControl, _convertKwanza),
                     ],
                   ),
                 );
@@ -101,6 +109,7 @@ class _HomeConverState extends State<HomeConver> {
     double real = double.parse(text);
     dolarControl.text = (real / dolar).toStringAsFixed(2);
     euroControl.text = (real / euro).toStringAsFixed(2);
+    kwanzaControl.text = (real / kwanza).toStringAsFixed(2);
   }
 
   void _convertDolar(String text) {
@@ -112,6 +121,7 @@ class _HomeConverState extends State<HomeConver> {
     double dolar = double.parse(text);
     realControl.text = (this.dolar * dolar).toStringAsFixed(2);
     euroControl.text = ((this.dolar * dolar) / euro).toStringAsFixed(2);
+    kwanzaControl.text = ((this.dolar * dolar) / kwanza).toStringAsFixed(2);
   }
 
   void _convertEuro(String text) {
@@ -123,12 +133,27 @@ class _HomeConverState extends State<HomeConver> {
     double euro = double.parse(text);
     realControl.text = (this.euro * euro).toStringAsFixed(2);
     dolarControl.text = ((this.euro * euro) / dolar).toStringAsFixed(2);
+    kwanzaControl.text = ((this.euro * euro) / kwanza).toStringAsFixed(2);
+  }
+
+  void _convertKwanza(String text) {
+    if (text.trim().isEmpty) {
+      _clearFields();
+      return;
+    }
+
+    double kwanza = double.parse(text);
+
+    realControl.text = (this.kwanza * kwanza).toStringAsFixed(2);
+    dolarControl.text = ((this.kwanza * kwanza) / dolar).toStringAsFixed(2);
+    euroControl.text = ((this.kwanza * kwanza) / euro).toStringAsFixed(2);
   }
 
   void _clearFields() {
     realControl.clear();
     dolarControl.clear();
     euroControl.clear();
+    kwanzaControl.clear();
   }
 }
 
@@ -137,7 +162,7 @@ Future<Map> getData() async {
   //* https://docs.awesomeapi.com.br/api-de-moedas
 
   const requestApi =
-      "https://economia.awesomeapi.com.br/json/last/USD-BRL,EUR-BRL";
+      "https://economia.awesomeapi.com.br/json/last/USD-BRL,EUR-BRL,CHF-BRL";
   var response = await http.get(Uri.parse(requestApi));
   return jsonDecode(response.body);
 
