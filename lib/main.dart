@@ -7,9 +7,9 @@ void main() async {
     home: const HomeConver(),
     theme: ThemeData().copyWith(
         colorScheme: thema.colorScheme.copyWith(
-      primary: Colors.purple,
+      primary: Color.fromARGB(255, 128, 188, 68),
       //secondary: Colors.blue,
-      //background: Colors.blue,
+      // background: Colors.blue,
     )),
     debugShowCheckedModeBanner: false,
   ));
